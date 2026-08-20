@@ -1,4 +1,4 @@
-﻿# LogiGraph â€” Shipment Intelligence Platform
+﻿# LogiGraph Shipment Intelligence Platform
 
 
 
@@ -209,3 +209,76 @@ Shipment
 
 This makes relationship-heavy logistics queries easier to model and reason
 about compared with a relational schema built primarily around JOIN operations.
+
+## Main Cypher Queries
+
+LogiGraph uses parameterised Cypher queries through the official Neo4j Java
+driver. Query parameters are passed separately from the Cypher statements;
+no user input is concatenated into query strings.
+
+1. Find All Shipments
+
+```cypher
+MATCH (s:Shipment)
+RETURN s
+ORDER BY s.id
+//This query retrieves all shipment nodes available in the graph.
+2. Find a Shipment by ID
+MATCH (s:Shipment {id: $id})
+RETURN s
+//The shipment ID is supplied as the $id parameter.
+3. Find Shipment Tracking Events
+MATCH (s:Shipment {id: $shipmentId})
+      -[:HAS_EVENT]->(e:TrackingEvent)
+RETURN e
+ORDER BY e.timestamp
+//This follows the relationship between a shipment and its tracking events.
+4. Multi-Hop Shipment Location Traversal
+MATCH (s:Shipment {id: $shipmentId})
+      -[:HAS_EVENT]->(e:TrackingEvent)
+      -[:OCCURRED_AT]->(l:Location)
+RETURN e, l
+ORDER BY e.timestamp
+/*This is a multi-hop graph traversal:
+
+Shipment
+→ HAS_EVENT
+→ TrackingEvent
+→ OCCURRED_AT
+→ Location
+
+The query can therefore determine where shipment activity occurred without
+requiring separate application-level lookups.*/
+5. Find Shipments Affected by a Disruption
+MATCH (d:Disruption {id: $disruptionId})
+      <-[:AFFECTS]-(l:Location)
+      <-[:ORIGIN|DESTINATION]-(s:Shipment)
+RETURN DISTINCT s
+/*
+This query traverses:
+
+Disruption
+→ affected Location
+→ Shipment
+
+It demonstrates how operational disruptions can be connected to shipments
+through shared locations.
+*/
+6. Shipment → Vehicle → Driver
+MATCH (s:Shipment {id: $shipmentId})
+      -[:USES]->(v:Vehicle)
+      -[:DRIVEN_BY]->(d:Driver)
+RETURN s, v, d
+/*
+This multi-hop traversal identifies the vehicle and driver associated with a
+shipment.*/
+7. Find the Customer and Route for a Shipment
+MATCH (c:Customer)
+      -[:OWNS]->(s:Shipment {id: $shipmentId})
+      -[:ORIGIN]->(origin:Location)
+MATCH (s)-[:DESTINATION]->(destination:Location)
+RETURN c, s, origin, destination
+/*
+This query retrieves the customer, shipment, origin and destination as one
+connected graph result.*/
+
