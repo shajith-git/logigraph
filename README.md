@@ -193,3 +193,50 @@ This makes multi-hop relationship queries natural and keeps the data model close
 Shipment â”€â”€USESâ”€â”€> Vehicle â”€â”€DRIVEN\_BYâ”€â”€> Driver
 
 
+## Data Model
+
+```mermaid
+graph TD
+    C[Customer] -->|RECEIVES| S[Shipment]
+
+    S -->|ORIGINATES_FROM| L1[Location]
+    S -->|DESTINED_FOR| L2[Location]
+
+    S -->|HAS_EVENT| E[TrackingEvent]
+    E -->|OCCURRED_AT| L3[Location]
+
+    L3 -->|AFFECTS| D[Disruption]
+
+    S -->|ASSIGNED_TO| V[Vehicle]
+    V -->|DRIVEN_BY| DR[Driver]
+```
+
+
+
+
+                 Customer
+                    |
+                 RECEIVES
+                    |
+                    v
+                 Shipment
+              /     |      \
+             /      |       \
+ORIGINATES  /    HAS_EVENT   \ ASSIGNED_TO
+           v         |         v
+       Location      v       Vehicle
+                     |          |
+               OCCURRED_AT   DRIVEN_BY
+                     |          |
+                     v          v
+                  Location    Driver
+                     |
+                   AFFECTS
+                     |
+                     v
+                 Disruption
+
+Shipment ──DESTINED_FOR──> Location
+
+
+
