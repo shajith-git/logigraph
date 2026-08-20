@@ -1,0 +1,8 @@
+POST http://localhost:8080/api/shipments
+Content-Type: application/json
+
+{
+  "id": "SHP001",
+  "status": "IN_TRANSIT",
+  "weight": 25.5
+}
