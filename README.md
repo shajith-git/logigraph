@@ -118,79 +118,7 @@ This makes multi-hop relationship queries natural and keeps the data model close
 
 
 
-\# Data Model
 
-
-
-```text
-
-&#x20;                        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-
-&#x20;                        â”‚   Customer      â”‚
-
-&#x20;                        â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
-
-&#x20;                                 â”‚
-
-&#x20;                               OWNS
-
-&#x20;                                 â”‚
-
-&#x20;                                 â–¼
-
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-
-â”‚   Location      â”‚â—„â”€â”€â”€â”€â”€â”€â”‚   Shipment       â”‚â”€â”€â”€â”€â”€â”€â–ºâ”‚   Location       â”‚
-
-â”‚   Origin        â”‚          â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜          â”‚ Destination      â”‚
-
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â”‚                           â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-
-&#x20;                               â”‚
-
-&#x20;                          HAS\_EVENT
-
-&#x20;                               â”‚
-
-&#x20;                               â–¼
-
-&#x20;                      â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-
-&#x20;                      â”‚   TrackingEvent       â”‚
-
-&#x20;                      â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-
-&#x20;                               â”‚
-
-&#x20;                          OCCURRED\_AT
-
-&#x20;                               â”‚
-
-&#x20;                               â–¼
-
-&#x20;                        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-
-&#x20;                        â”‚  Location       â”‚
-
-&#x20;                        â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
-
-&#x20;                               â”‚
-
-&#x20;                            AFFECTS
-
-&#x20;                               â”‚
-
-&#x20;                               â–¼
-
-&#x20;                      â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-
-&#x20;                      â”‚  Disruption         â”‚
-
-&#x20;                      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-
-
-
-Shipment â”€â”€USESâ”€â”€> Vehicle â”€â”€DRIVEN\_BYâ”€â”€> Driver
 
 
 ## Data Model
@@ -213,30 +141,27 @@ graph TD
 
 
 
-
-                 Customer
-                    |
-                 RECEIVES
-                    |
-                    v
-                 Shipment
-              /     |      \
-             /      |       \
-ORIGINATES  /    HAS_EVENT   \ ASSIGNED_TO
-           v         |         v
-       Location      v       Vehicle
-                     |          |
-               OCCURRED_AT   DRIVEN_BY
-                     |          |
-                     v          v
-                  Location    Driver
-                     |
-                   AFFECTS
-                     |
-                     v
-                 Disruption
-
-Shipment ──DESTINED_FOR──> Location
-
+Customer
+   |
+ RECEIVES
+   ↓
+Shipment
+ ├── ORIGINATES_FROM ──→ Location
+ ├── DESTINED_FOR ─────→ Location
+ ├── HAS_EVENT ────────→ TrackingEvent
+ │                          |
+ │                       OCCURRED_AT
+ │                          ↓
+ │                       Location
+ │                          |
+ │                        AFFECTS
+ │                          ↓
+ │                      Disruption
+ │
+ └── ASSIGNED_TO ─────→ Vehicle
+                            |
+                         DRIVEN_BY
+                            ↓
+                          Driver
 
 
