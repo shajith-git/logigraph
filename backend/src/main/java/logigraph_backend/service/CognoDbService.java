@@ -10,6 +10,7 @@ import logigraph_backend.model.Vehicle;
 import logigraph_backend.model.TrackingEvent;
 import logigraph_backend.model.LocationRequest;
 import logigraph_backend.model.Disruption;
+import logigraph_backend.model.ShipmentGraphResponse;
 
 @Service
 public class CognoDbService {
@@ -491,6 +492,85 @@ public class CognoDbService {
                             record.get("status").asString(),
                             record.get("weight").asDouble()
                     ))
+            );
+        }
+    }
+    public ShipmentGraphResponse getShipmentGraph(String shipmentId) {
+
+        String query = """
+        MATCH (s:Shipment {id: $shipmentId})
+
+        OPTIONAL MATCH (c:Customer)-[:OWNS]->(s)
+
+        OPTIONAL MATCH (s)-[:ASSIGNED_TO]->(v:Vehicle)
+        OPTIONAL MATCH (v)-[:DRIVEN_BY]->(d:Driver)
+
+        RETURN
+            s.id AS shipmentId,
+            s.status AS shipmentStatus,
+            s.weight AS weight,
+
+            c.id AS customerId,
+            c.name AS customerName,
+
+            v.id AS vehicleId,
+            v.registrationNumber AS registrationNumber,
+            v.type AS vehicleType,
+
+            d.id AS driverId,
+            d.name AS driverName,
+            d.phone AS driverPhone
+        """;
+
+        try (Session session = driver.session()) {
+
+            return session.executeRead(tx ->
+                    tx.run(
+                                    query,
+                                    org.neo4j.driver.Values.parameters(
+                                            "shipmentId", shipmentId
+                                    )
+                            )
+                            .list(record -> new ShipmentGraphResponse(
+                                    record.get("shipmentId").asString(),
+                                    record.get("shipmentStatus").asString(),
+                                    record.get("weight").asDouble(),
+
+                                    record.get("customerId").isNull()
+                                            ? null
+                                            : record.get("customerId").asString(),
+
+                                    record.get("customerName").isNull()
+                                            ? null
+                                            : record.get("customerName").asString(),
+
+                                    record.get("vehicleId").isNull()
+                                            ? null
+                                            : record.get("vehicleId").asString(),
+
+                                    record.get("registrationNumber").isNull()
+                                            ? null
+                                            : record.get("registrationNumber").asString(),
+
+                                    record.get("vehicleType").isNull()
+                                            ? null
+                                            : record.get("vehicleType").asString(),
+
+                                    record.get("driverId").isNull()
+                                            ? null
+                                            : record.get("driverId").asString(),
+
+                                    record.get("driverName").isNull()
+                                            ? null
+                                            : record.get("driverName").asString(),
+
+                                    record.get("driverPhone").isNull()
+                                            ? null
+                                            : record.get("driverPhone").asString()
+                            ))
+                            .stream()
+                            .findFirst()
+                            .orElse(null)
             );
         }
     }

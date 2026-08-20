@@ -281,4 +281,39 @@ RETURN c, s, origin, destination
 /*
 This query retrieves the customer, shipment, origin and destination as one
 connected graph result.*/
+----------------------------
+## Setup and Run
+
+### Prerequisites
+
+Make sure the following are installed:
+
+- Java 21
+- Maven
+- Node.js and npm
+- Git
+- A CognoDB Cloud account
+
+### 1. Create a CognoDB Instance
+
+Create a free CognoDB instance from the CognoDB Cloud console.
+
+The database provides:
+
+- Bolt connection URI
+- Username
+- Password
+
+The application connects to CognoDB using the official Neo4j Java driver.
+
+### 2. Configure Environment Variables
+
+LogiGraph reads the CognoDB connection details from environment variables.
+
+Required variables:
+
+```text
+COGNODB_URI=bolt+s://your-instance-id.databases.cognodb.cloud
+COGNODB_USERNAME=cognodb
+COGNODB_PASSWORD=your-cognodb-password
 

@@ -21,6 +21,7 @@ import logigraph_backend.model.TrackingEvent;
 import logigraph_backend.model.TrackingEventRequest;
 import logigraph_backend.model.Disruption;
 import logigraph_backend.model.DisruptionRequest;
+import logigraph_backend.model.ShipmentGraphResponse;
 
 @RestController
 public class CognoDbController {
@@ -175,4 +176,11 @@ public class CognoDbController {
 
         return cognoDbService.getTrackingEvents(shipmentId);
     }
+    @GetMapping("/api/shipments/{shipmentId}/graph")
+    public ShipmentGraphResponse getShipmentGraph(
+            @PathVariable String shipmentId) {
+
+        return cognoDbService.getShipmentGraph(shipmentId);
+    }
+
 }
