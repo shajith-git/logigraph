@@ -165,3 +165,47 @@ Shipment
                           Driver
 
 
+
+## Why a Graph Database?
+
+Logistics data is highly relationship-driven.
+
+A shipment is connected to a customer, origin, destination, tracking events,
+vehicles, drivers, and potentially operational disruptions. These connections
+are not isolated records; they form a network of related entities.
+
+A relational database could represent the same information using multiple
+tables and foreign keys. However, questions involving several relationships
+would require multiple JOIN operations and increasingly complex queries.
+
+CognoDB is a better fit for LogiGraph because relationships are first-class
+elements of the data model.
+
+For example, LogiGraph can answer questions such as:
+
+- Which shipments are affected by a particular disruption?
+- Where was a shipment when a tracking event occurred?
+- Which vehicle and driver are responsible for a shipment?
+- Which customers own shipments currently affected by an operational problem?
+- What locations, events, and disruptions are connected to a shipment?
+
+These questions can be represented naturally as graph traversals.
+
+For example:
+
+Shipment
+→ HAS_EVENT
+→ TrackingEvent
+→ OCCURRED_AT
+→ Location
+
+and:
+
+Shipment
+→ USES
+→ Vehicle
+→ DRIVEN_BY
+→ Driver
+
+This makes relationship-heavy logistics queries easier to model and reason
+about compared with a relational schema built primarily around JOIN operations.
